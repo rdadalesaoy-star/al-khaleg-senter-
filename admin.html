@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - متجر الخليج</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f8fafc; padding: 20px; color: #1e293b; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .btn-back { background: #64748b; color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; }
+        
+        .admin-panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; width: 100%; }
+        
+        .action-btns { display: flex; gap: 10px; }
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-add { background: #2563eb; color: white; flex: 1; }
+        .btn-cancel { background: #64748b; color: white; display: none; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; }
+        .product-card img { width: 100%; height: 180px; object-fit: cover; background: #f1f5f9; }
+        .product-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+        .discount-badge { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        .card-actions { display: flex; gap: 8px; margin-top: 15px; }
+        .btn-edit { background: #f59e0b; color: white; flex: 1; }
+        .btn-delete { background: #ef4444; color: white; flex: 1; }
+    </style>
+</head>
+<body>
+
+<script>
+    if (sessionStorage.getItem("admin_logged") !== "true") {
+        alert("غير مسموح لك بالدخول لهذه الصفحة مباشرة!");
+        window.location.href = "index.html";
+    }
+</script>
+
+<div class="container">
+    <div class="header">
+        <h1>لوحة تحكم المتجر</h1>
+        <a href="index.html" class="btn-back">⬅️ العودة للمتجر</a>
+    </div>
+
+    <div class="admin-panel">
+        <h3 id="panelTitle">إضافة منتج جديد</h3>
+        <input type="hidden" id="editProductId">
+        
+        <div class="form-grid" style="margin-top:15px;">
+            <input type="text" id="title" placeholder="اسم المنتج">
+            <input type="number" id="price" placeholder="السعر الحالي (د.ع)">
+            <input type="number" id="old_price" placeholder="السعر قبل الخصم (اختياري)">
+            <div>
+                <label style="font-size:12px;">اختر صورة جديدة من الجهاز (اختياري):</label>
+                <input type="file" id="imageFile" accept="image/*">
+            </div>
+            <input type="text" id="imageUrl" placeholder="أو رابط صورة URL">
+        </div>
+
+        <div class="action-btns">
+            <button id="submitBtn" class="btn-add" onclick="handleSaveProduct()">إضافة للمتجر</button>
+            <button id="cancelBtn" class="btn-cancel" onclick="resetForm()">إلغاء التعديل</button>
+        </div>
+    </div>
+
+    <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://qrvgqswndpryqpbllmpu.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_ffWJ28oHE28fC3TF5rI30Q_5ZZiPbUT';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allProducts = [];
+
+    async function fetchProducts() {
+        const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+        if (error) {
+            console.error(error);
+            return;
+        }
+        allProducts = data || [];
+
+        // ترتيب المنتجات: المنتجات التي تحتوي على خصم تظهر أولاً
+        allProducts.sort((a, b) => {
+            const hasDiscountA = a.old_price && a.old_price > a.price;
+            const hasDiscountB = b.old_price && b.old_price > b.price;
+            if (hasDiscountA && !hasDiscountB) return -1;
+            if (!hasDiscountA && hasDiscountB) return 1;
+            return 0;
+        });
+
+        const grid = document.getElementById('productsGrid');
+
+        grid.innerHTML = allProducts.map(product => {
+            const hasDiscount = product.old_price && product.old_price > product.price;
+            return `
+                <div class="product-card">
+                    ${hasDiscount ? `<div class="discount-badge">خصم 🔥</div>` : ''}
+                    <img src="${product.image_url || 'https://via.placeholder.com/200?text=No+Image'}" alt="${product.title}">
+                    <div class="product-info">
+                        <div style="font-weight:bold; margin-bottom:5px;">${product.title}</div>
+                        <div>
+                            <span style="color:#059669; font-weight:bold;">${product.price} د.ع</span>
+                            ${hasDiscount ? `<span style="text-decoration:line-through; color:#94a3b8; font-size:12px; margin-right:8px;">${product.old_price} د.ع</span>` : ''}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-edit" onclick="startEditProduct(${product.id})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteProduct(${product.id})">حذف</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function handleSaveProduct() {
+        const submitBtn = document.getElementById('submitBtn');
+        const editId = document.getElementById('editProductId').value;
+        const title = document.getElementById('title').value.trim();
+        const price = document.getElementById('price').value.trim();
+        const oldPriceInput = document.getElementById('old_price').value.trim();
+        const file = document.getElementById('imageFile').files[0];
+        const urlInput = document.getElementById('imageUrl').value.trim();
+
+        if (!title || !price) return alert('يرجى كتابة اسم المنتج والسعر');
+
+        // تعطيل الزر وعرض حالة التحميل لمنع الضغط المزدوج
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = '⏳ جاري الحفظ...';
+
+        try {
+            const parsedPrice = parseFloat(price);
+            const parsedOldPrice = oldPriceInput !== '' ? parseFloat(oldPriceInput) : null;
+
+            let finalImageUrl = urlInput;
+
+            // في حال تم اختيار صورة ملف جديدة
+            if (file) {
+                const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { error: uploadError } = await supabaseClient.storage.from('product-images').upload(fileName, file);
+
+                if (!uploadError) {
+                    const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+                    finalImageUrl = urlData.publicUrl;
+                } else {
+                    alert("حدث خطأ أثناء رفع الصورة: " + uploadError.message);
+                    return;
+                }
+            }
+
+            // إذا كنا في وضع التعديل، ولم يقم الأدمن بإدخال صورة جديدة، نعتمد الصورة القديمة
+            if (editId && !finalImageUrl) {
+                const currentProduct = allProducts.find(p => p.id == editId);
+                if (currentProduct) {
+                    finalImageUrl = currentProduct.image_url;
+                }
+            }
+
+            const productPayload = { 
+                title: title, 
+                price: parsedPrice, 
+                old_price: parsedOldPrice,
+                image_url: finalImageUrl || null
+            };
+
+            let resultError;
+            if (editId) {
+                const { error } = await supabaseClient.from('products').update(productPayload).eq('id', editId);
+                resultError = error;
+            } else {
+                const { error } = await supabaseClient.from('products').insert([productPayload]);
+                resultError = error;
+            }
+
+            if (resultError) {
+                alert("حدث خطأ أثناء الحفظ: " + resultError.message);
+            } else {
+                alert(editId ? "تم حفظ التعديلات بنجاح!" : "تمت إضافة المنتج بنجاح!");
+                resetForm();
+                await fetchProducts();
+            }
+        } catch (err) {
+            console.error(err);
+            alert("حدث خطأ غير متوقع!");
+        } finally {
+            // إعادة تفعيل الزر ورجوع النص السابق
+            submitBtn.disabled = false;
+            submitBtn.innerText = editId ? 'حفظ التعديلات' : 'إضافة للمتجر';
+        }
+    }
+
+    function startEditProduct(id) {
+        const product = allProducts.find(p => p.id === id);
+        if (!product) return;
+
+        document.getElementById('editProductId').value = product.id;
+        document.getElementById('title').value = product.title;
+        document.getElementById('price').value = product.price;
+        document.getElementById('old_price').value = product.old_price || '';
+        document.getElementById('imageUrl').value = product.image_url || '';
+
+        document.getElementById('panelTitle').innerText = 'تعديل المنتج';
+        document.getElementById('submitBtn').innerText = 'حفظ التعديلات';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById('editProductId').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('old_price').value = '';
+        document.getElementById('imageUrl').value = '';
+        document.getElementById('imageFile').value = '';
+
+        document.getElementById('panelTitle').innerText = 'إضافة منتج جديد';
+        document.getElementById('submitBtn').innerText = 'إضافة للمتجر';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    async function deleteProduct(id) {
+        if (confirm('هل أنت تأكد من الحذف؟')) {
+            const { error } = await supabaseClient.from('products').delete().eq('id', id);
+            if (error) {
+                alert("حدث خطأ أثناء الحذف: " + error.message);
+            } else {
+                fetchProducts();
+            }
+        }
+    }
+
+    fetchProducts();
+</script>
+</body>
+</html>
