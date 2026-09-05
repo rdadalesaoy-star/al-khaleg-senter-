@@ -15,7 +15,7 @@
         
         .admin-panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #e2e8f0; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
-        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; width: 100%; }
+        input[type="text"], input[type="number"], select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; width: 100%; background: white; }
         
         .action-btns { display: flex; gap: 10px; }
         button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
@@ -56,6 +56,15 @@
             <input type="text" id="title" placeholder="اسم المنتج">
             <input type="number" id="price" placeholder="السعر الحالي (د.ع)">
             <input type="number" id="old_price" placeholder="السعر قبل الخصم (اختياري)">
+            
+            <select id="category">
+                <option value="كهربائيات">⚡ كهربائيات</option>
+                <option value="أدوات مطبخ">🍳 أدوات مطبخ</option>
+                <option value="عناية شخصية">🧴 عناية شخصية</option>
+                <option value="ديكورات">🛋️ ديكورات</option>
+                <option value="إلكترونيات">📱 إلكترونيات</option>
+            </select>
+
             <div>
                 <label style="font-size:12px;">اختر صورة جديدة من الجهاز (اختياري):</label>
                 <input type="file" id="imageFile" accept="image/*">
@@ -87,15 +96,6 @@
         }
         allProducts = data || [];
 
-        // ترتيب المنتجات: المنتجات التي تحتوي على خصم تظهر أولاً
-        allProducts.sort((a, b) => {
-            const hasDiscountA = a.old_price && a.old_price > a.price;
-            const hasDiscountB = b.old_price && b.old_price > b.price;
-            if (hasDiscountA && !hasDiscountB) return -1;
-            if (!hasDiscountA && hasDiscountB) return 1;
-            return 0;
-        });
-
         const grid = document.getElementById('productsGrid');
 
         grid.innerHTML = allProducts.map(product => {
@@ -105,7 +105,8 @@
                     ${hasDiscount ? `<div class="discount-badge">خصم 🔥</div>` : ''}
                     <img src="${product.image_url || 'https://via.placeholder.com/200?text=No+Image'}" alt="${product.title}">
                     <div class="product-info">
-                        <div style="font-weight:bold; margin-bottom:5px;">${product.title}</div>
+                        <div style="font-weight:bold; margin-bottom:2px;">${product.title}</div>
+                        <div style="font-size:12px; color:#64748b; margin-bottom:8px;">📁 ${product.category || 'غير محدد'}</div>
                         <div>
                             <span style="color:#059669; font-weight:bold;">${product.price} د.ع</span>
                             ${hasDiscount ? `<span style="text-decoration:line-through; color:#94a3b8; font-size:12px; margin-right:8px;">${product.old_price} د.ع</span>` : ''}
@@ -126,14 +127,13 @@
         const title = document.getElementById('title').value.trim();
         const price = document.getElementById('price').value.trim();
         const oldPriceInput = document.getElementById('old_price').value.trim();
+        const category = document.getElementById('category').value;
         const file = document.getElementById('imageFile').files[0];
         const urlInput = document.getElementById('imageUrl').value.trim();
 
         if (!title || !price) return alert('يرجى كتابة اسم المنتج والسعر');
 
-        // تعطيل الزر وعرض حالة التحميل لمنع الضغط المزدوج
         submitBtn.disabled = true;
-        const originalText = submitBtn.innerText;
         submitBtn.innerText = '⏳ جاري الحفظ...';
 
         try {
@@ -142,7 +142,6 @@
 
             let finalImageUrl = urlInput;
 
-            // في حال تم اختيار صورة ملف جديدة
             if (file) {
                 const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
                 const { error: uploadError } = await supabaseClient.storage.from('product-images').upload(fileName, file);
@@ -156,7 +155,6 @@
                 }
             }
 
-            // إذا كنا في وضع التعديل، ولم يقم الأدمن بإدخال صورة جديدة، نعتمد الصورة القديمة
             if (editId && !finalImageUrl) {
                 const currentProduct = allProducts.find(p => p.id == editId);
                 if (currentProduct) {
@@ -168,6 +166,7 @@
                 title: title, 
                 price: parsedPrice, 
                 old_price: parsedOldPrice,
+                category: category,
                 image_url: finalImageUrl || null
             };
 
@@ -191,7 +190,6 @@
             console.error(err);
             alert("حدث خطأ غير متوقع!");
         } finally {
-            // إعادة تفعيل الزر ورجوع النص السابق
             submitBtn.disabled = false;
             submitBtn.innerText = editId ? 'حفظ التعديلات' : 'إضافة للمتجر';
         }
@@ -205,6 +203,7 @@
         document.getElementById('title').value = product.title;
         document.getElementById('price').value = product.price;
         document.getElementById('old_price').value = product.old_price || '';
+        document.getElementById('category').value = product.category || 'كهربائيات';
         document.getElementById('imageUrl').value = product.image_url || '';
 
         document.getElementById('panelTitle').innerText = 'تعديل المنتج';
