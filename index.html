@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سنتر الخليج </title>
+    <title>سنتر الخليج</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -39,48 +39,105 @@
         .cart-badge { background: var(--accent); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; }
 
         /* البانر الترحيبي (Hero Banner) */
-        .hero-banner { background: linear-gradient(135deg, #e8f0e6 0%, #fefae0 100%); border-radius: 20px; padding: 30px 25px; margin: 25px 0; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #e0e7d9; }
+        .hero-banner { background: linear-gradient(135deg, #e8f0e6 0%, #fefae0 100%); border-radius: 20px; padding: 30px 25px; margin: 25px 0 20px 0; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #e0e7d9; }
         .hero-banner h2 { font-size: 26px; color: var(--primary); margin-bottom: 8px; font-weight: 700; }
         .hero-banner p { color: var(--text-muted); font-size: 15px; max-width: 500px; margin-bottom: 20px; }
         
-        /* مميزات المتجر السريعة */
         .features-bar { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .feature-item { font-size: 13px; color: var(--text-dark); background: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 15px; border: 1px solid #e2ded4; }
 
+        /* شريط الأقسام */
+        .categories-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 5px 5px 15px 5px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+        }
+        .categories-container::-webkit-scrollbar { height: 4px; }
+        .categories-container::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 4px; }
+
+        .category-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 85px;
+            padding: 12px 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .category-btn .icon { font-size: 24px; margin-bottom: 4px; }
+        .category-btn .title { font-size: 13px; font-weight: 700; color: var(--text-dark); white-space: nowrap; }
+
+        .category-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .category-btn.active .title { color: white; }
+
         /* شريط البحث */
-        .search-container { margin-bottom: 30px; display: flex; justify-content: center; }
+        .search-container { margin-bottom: 25px; display: flex; justify-content: center; }
         .search-wrapper { position: relative; width: 100%; max-width: 550px; }
         .search-input { width: 100%; padding: 14px 20px 14px 45px; border: 2px solid var(--border-color); border-radius: 30px; font-size: 15px; outline: none; transition: all 0.2s; background: white; }
         .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1); }
         .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
 
-        /* شبكة المنتجات */
+        /* عناوين العرض */
+        .section-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+        /* قسم الخصومات السريعة - التمرير الأفقي (يمين ويسار) */
+        .discounts-section { margin-bottom: 35px; background: #fffdf9; padding: 18px; border-radius: 20px; border: 1px solid #f0e6d2; }
+        .discounts-scroll {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding: 5px 5px 15px 5px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .discounts-scroll::-webkit-scrollbar { height: 6px; }
+        .discounts-scroll::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
+        .discount-card-item { min-width: 230px; width: 230px; flex-shrink: 0; }
+
+        /* شبكة المنتجات العادية - التمرير العمودي (فوق وتحت) */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; }
-        .product-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; transition: all 0.3s ease; position: relative; }
+
+        /* تصميم كرت المنتج العام */
+        .product-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; transition: all 0.3s ease; position: relative; height: 100%; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #d6cfc0; }
         
         .discount-tag { position: absolute; top: 12px; right: 12px; background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 2; box-shadow: 0 2px 6px rgba(239,68,68,0.3); }
 
-        .img-container { position: relative; width: 100%; height: 210px; background: #f7f5f0; overflow: hidden; }
-        .product-card img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.4s ease; }
+        /* إظهار الصورة كاملة بدون قص */
+        .img-container { position: relative; width: 100%; height: 220px; background: #fdfbf7; overflow: hidden; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .product-card img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: transform 0.4s ease; }
         .product-card:hover img { transform: scale(1.05); }
         
-        .product-info { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
-        .product-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); line-height: 1.3; }
+        .product-info { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); line-height: 1.3; }
         
-        .price-area { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
-        .product-price { font-size: 19px; color: var(--primary); font-weight: 800; }
-        .old-price { font-size: 14px; color: #94a3b8; text-decoration: line-through; }
+        .price-area { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .product-price { font-size: 18px; color: var(--primary); font-weight: 800; }
+        .old-price { font-size: 13px; color: #94a3b8; text-decoration: line-through; }
         
-        .btn-add-cart { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: auto; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-add-cart { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 9px; border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: auto; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .btn-add-cart:hover { background: var(--primary); color: white; }
 
-        /* نافذة تكبير الصورة (Image Modal) */
+        /* نافذة تكبير الصورة */
         .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(4px); }
         .image-modal-content { max-width: 90%; max-height: 85vh; border-radius: 12px; object-fit: contain; }
         .close-image-btn { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; }
 
-        /* نافذة سلة الشراء (Cart Modal) */
+        /* نافذة سلة الشراء */
         .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
         .cart-content { background: white; width: 90%; max-width: 450px; border-radius: 20px; padding: 25px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
@@ -125,15 +182,54 @@
         </div>
     </div>
 
+    <!-- شريط الأقسام -->
+    <div class="categories-container" id="categoriesBar">
+        <div class="category-btn active" onclick="filterCategory('الكل', this)">
+            <span class="icon">✨</span>
+            <span class="title">الكل</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('حاجة بألف', this)">
+            <span class="icon">🏷️</span>
+            <span class="title">حاجة بألف</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('كهربائيات', this)">
+            <span class="icon">⚡</span>
+            <span class="title">كهربائيات</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('أدوات مطبخ', this)">
+            <span class="icon">🍳</span>
+            <span class="title">أدوات مطبخ</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('عناية شخصية', this)">
+            <span class="icon">🧴</span>
+            <span class="title">عناية شخصية</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('ديكورات', this)">
+            <span class="icon">🛋️</span>
+            <span class="title">ديكورات</span>
+        </div>
+        <div class="category-btn" onclick="filterCategory('إلكترونيات', this)">
+            <span class="icon">📱</span>
+            <span class="title">إلكترونيات</span>
+        </div>
+    </div>
+
     <!-- شريط البحث -->
     <div class="search-container">
         <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن أدوات مطبخ، ديكور، مستلزمات..." oninput="filterProducts()">
+            <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن أدوات مطبخ، ديكور، مستلزمات..." oninput="applyFilters()">
             <span class="search-icon">🔍</span>
         </div>
     </div>
 
-    <!-- شبكة عرض المنتجات -->
+    <!-- بوكس الخصومات الخاص (يمين ويسار) -->
+    <div class="discounts-section" id="discountsWrapper" style="display: none;">
+        <div class="section-title">🔥 عروض الخصومات المميزة</div>
+        <div class="discounts-scroll" id="discountsGrid"></div>
+    </div>
+
+    <!-- المنتجات العادية (فوق وتحت) -->
+    <div class="section-title">🛒 كافة المنتجات</div>
     <div class="products-grid" id="productsGrid">
         <p style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">جاري تحميل المنتجات المنزلية...</p>
     </div>
@@ -159,14 +255,15 @@
 </div>
 
 <script>
-    const ADMIN_PASSWORD = "2102005سنتر الخليج"; // رمز دخول الأدمن
-    const MY_PHONE_NUMBER = "9647771575660"; // اكتب رقم هاتفك المربوط بالواتساب هنا
+    const ADMIN_PASSWORD = "2102005سنتر الخليج";
+    const MY_PHONE_NUMBER = "9647771575660";
 
     const SUPABASE_URL = 'https://qrvgqswndpryqpbllmpu.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ffWJ28oHE28fC3TF5rI30Q_5ZZiPbUT';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let products = [];
+    let currentCategory = 'الكل';
     let cart = JSON.parse(localStorage.getItem('my_cart')) || [];
 
     async function fetchProducts() {
@@ -179,63 +276,82 @@
         }
 
         products = data;
-
-        // فرز المنتجات: المنتجات المخفضة تظهر بالبداية أولاً
-        products.sort((a, b) => {
-            const hasDiscountA = a.old_price && a.old_price > a.price;
-            const hasDiscountB = b.old_price && b.old_price > b.price;
-            if (hasDiscountA && !hasDiscountB) return -1;
-            if (!hasDiscountA && hasDiscountB) return 1;
-            return 0;
-        });
-
-        renderProducts(products);
+        applyFilters();
         updateCartUI();
     }
 
-    function renderProducts(itemsToRender) {
-        const grid = document.getElementById('productsGrid');
+    function createProductHTML(product) {
+        const imgSrc = product.image_url || 'https://via.placeholder.com/300x300?text=Home+Product';
+        const hasDiscount = product.old_price && product.old_price > product.price;
 
-        if (itemsToRender.length === 0) {
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">لم نجد منتجات تطابق بحثك 🔍</p>';
-            return;
-        }
-
-        grid.innerHTML = itemsToRender.map(product => {
-            const imgSrc = product.image_url || 'https://via.placeholder.com/300x300?text=Home+Product';
-            const hasDiscount = product.old_price && product.old_price > product.price;
-
-            return `
-                <div class="product-card">
-                    ${hasDiscount ? `<div class="discount-tag">خصم 🔥</div>` : ''}
-                    <div class="img-container">
-                        <img src="${imgSrc}" alt="${product.title}" onclick="openImageModal('${imgSrc}')">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title">${product.title}</div>
-                        <div class="price-area">
-                            <span class="product-price">${product.price} د.ع</span>
-                            ${hasDiscount ? `<span class="old-price">${product.old_price} د.ع</span>` : ''}
-                        </div>
-                        <button class="btn-add-cart" onclick="addToCart(${product.id})">
-                            <span>إضافة للسلة</span> 🛒
-                        </button>
-                    </div>
+        return `
+            <div class="product-card">
+                ${hasDiscount ? `<div class="discount-tag">خصم 🔥</div>` : ''}
+                <div class="img-container">
+                    <img src="${imgSrc}" alt="${product.title}" onclick="openImageModal('${imgSrc}')">
                 </div>
-            `;
-        }).join('');
+                <div class="product-info">
+                    <div class="product-title">${product.title}</div>
+                    <div class="price-area">
+                        <span class="product-price">${product.price} د.ع</span>
+                        ${hasDiscount ? `<span class="old-price">${product.old_price} د.ع</span>` : ''}
+                    </div>
+                    <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                        <span>إضافة للسلة</span> 🛒
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
-    function filterProducts() {
+    function applyFilters() {
         const query = document.getElementById('searchInput').value.trim().toLowerCase();
-        const filtered = products.filter(product => product.title.toLowerCase().includes(query));
-        renderProducts(filtered);
+        let filtered = products;
+
+        if (currentCategory === 'حاجة بألف') {
+            filtered = filtered.filter(p => p.category === 'حاجة بألف' || Number(p.price) === 1000);
+        } else if (currentCategory !== 'الكل') {
+            filtered = filtered.filter(p => p.category === currentCategory);
+        }
+
+        if (query !== '') {
+            filtered = filtered.filter(p => p.title.toLowerCase().includes(query));
+        }
+
+        const discountProducts = filtered.filter(p => p.old_price && p.old_price > p.price);
+        const regularProducts = filtered.filter(p => !p.old_price || p.old_price <= p.price);
+
+        const discountsWrapper = document.getElementById('discountsWrapper');
+        const discountsGrid = document.getElementById('discountsGrid');
+
+        if (discountProducts.length > 0) {
+            discountsWrapper.style.display = 'block';
+            discountsGrid.innerHTML = discountProducts.map(p => `<div class="discount-card-item">${createProductHTML(p)}</div>`).join('');
+        } else {
+            discountsWrapper.style.display = 'none';
+        }
+
+        const mainGrid = document.getElementById('productsGrid');
+
+        if (regularProducts.length === 0 && discountProducts.length === 0) {
+            mainGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">لم نجد منتجات تطابق اختيارك 🔍</p>';
+        } else if (regularProducts.length === 0) {
+            mainGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">جميع المنتجات المتاحة حالياً معروضة في قسم الخصومات أعلاه 🔥</p>';
+        } else {
+            mainGrid.innerHTML = regularProducts.map(p => createProductHTML(p)).join('');
+        }
+    }
+
+    function filterCategory(categoryName, btnElement) {
+        currentCategory = categoryName;
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+        applyFilters();
     }
 
     function openImageModal(imageSrc) {
-        const modal = document.getElementById('imageModal');
         document.getElementById('fullImage').src = imageSrc;
-        modal.style.display = 'flex';
+        document.getElementById('imageModal').style.display = 'flex';
     }
 
     function closeImageModal() {
