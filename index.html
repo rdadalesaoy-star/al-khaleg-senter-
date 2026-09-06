@@ -8,10 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2d5a27; /* أخضر زيتي مريح */
+            --primary: #2d5a27;
             --primary-hover: #1e3f1a;
-            --accent: #d4a373; /* لون ترابي/خشب دافئ */
-            --bg-main: #fdfbf7; /* خلفية كريمية هادئة */
+            --accent: #d4a373;
+            --bg-main: #fdfbf7;
             --card-bg: #ffffff;
             --text-dark: #2c3531;
             --text-muted: #6b705c;
@@ -23,7 +23,6 @@
         
         .container { max-width: 1050px; margin: 0 auto; padding: 0 20px; }
         
-        /* الهيدر العلوي */
         header { background: white; border-bottom: 1px solid var(--border-color); padding: 15px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 10px; }
@@ -38,7 +37,6 @@
         .btn-cart:hover { background: var(--primary-hover); transform: translateY(-1px); }
         .cart-badge { background: var(--accent); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; }
 
-        /* البانر الترحيبي (Hero Banner) */
         .hero-banner { background: linear-gradient(135deg, #e8f0e6 0%, #fefae0 100%); border-radius: 20px; padding: 30px 25px; margin: 25px 0 20px 0; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #e0e7d9; }
         .hero-banner h2 { font-size: 26px; color: var(--primary); margin-bottom: 8px; font-weight: 700; }
         .hero-banner p { color: var(--text-muted); font-size: 15px; max-width: 500px; margin-bottom: 20px; }
@@ -46,7 +44,6 @@
         .features-bar { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .feature-item { font-size: 13px; color: var(--text-dark); background: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 15px; border: 1px solid #e2ded4; }
 
-        /* شريط الأقسام */
         .categories-container {
             display: flex;
             gap: 12px;
@@ -84,17 +81,14 @@
         }
         .category-btn.active .title { color: white; }
 
-        /* شريط البحث */
         .search-container { margin-bottom: 25px; display: flex; justify-content: center; }
         .search-wrapper { position: relative; width: 100%; max-width: 550px; }
         .search-input { width: 100%; padding: 14px 20px 14px 45px; border: 2px solid var(--border-color); border-radius: 30px; font-size: 15px; outline: none; transition: all 0.2s; background: white; }
         .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1); }
         .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
 
-        /* عناوين العرض */
         .section-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 
-        /* قسم الخصومات السريعة - التمرير الأفقي (يمين ويسار) */
         .discounts-section { margin-bottom: 35px; background: #fffdf9; padding: 18px; border-radius: 20px; border: 1px solid #f0e6d2; }
         .discounts-scroll {
             display: flex;
@@ -108,18 +102,31 @@
         .discounts-scroll::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
         .discount-card-item { min-width: 230px; width: 230px; flex-shrink: 0; }
 
-        /* شبكة المنتجات العادية - التمرير العمودي (فوق وتحت) */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; }
 
-        /* تصميم كرت المنتج العام */
         .product-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; transition: all 0.3s ease; position: relative; height: 100%; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #d6cfc0; }
         
         .discount-tag { position: absolute; top: 12px; right: 12px; background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 2; box-shadow: 0 2px 6px rgba(239,68,68,0.3); }
 
-        /* إظهار الصورة كاملة بدون قص */
-        .img-container { position: relative; width: 100%; height: 220px; background: #fdfbf7; overflow: hidden; padding: 10px; display: flex; align-items: center; justify-content: center; }
-        .product-card img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: transform 0.4s ease; }
+        /* تم التعديل لتعبئة الحاوية بالكامل بدون حواف أو فراغات */
+        .img-container { 
+            position: relative; 
+            width: 100%; 
+            height: 220px; 
+            background: #fdfbf7; 
+            overflow: hidden; 
+            padding: 0; 
+        }
+        
+        .product-card img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: center; 
+            cursor: pointer; 
+            transition: transform 0.4s ease; 
+        }
         .product-card:hover img { transform: scale(1.05); }
         
         .product-info { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
@@ -132,12 +139,10 @@
         .btn-add-cart { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 9px; border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: auto; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .btn-add-cart:hover { background: var(--primary); color: white; }
 
-        /* نافذة تكبير الصورة */
         .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(4px); }
         .image-modal-content { max-width: 90%; max-height: 85vh; border-radius: 12px; object-fit: contain; }
         .close-image-btn { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; }
 
-        /* نافذة سلة الشراء */
         .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
         .cart-content { background: white; width: 90%; max-width: 450px; border-radius: 20px; padding: 25px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
@@ -171,7 +176,6 @@
 
 <div class="container">
 
-    <!-- البانر الترحيبي -->
     <div class="hero-banner">
         <h2>كل ما يحتاجه بيتك في مكان واحد 🏡</h2>
         <p>اكتشف تشكيلاتنا العصرية من الديكورات، الأواني، والمستلزمات المنزلية المميزة</p>
@@ -182,7 +186,6 @@
         </div>
     </div>
 
-    <!-- شريط الأقسام -->
     <div class="categories-container" id="categoriesBar">
         <div class="category-btn active" onclick="filterCategory('الكل', this)">
             <span class="icon">✨</span>
@@ -214,7 +217,6 @@
         </div>
     </div>
 
-    <!-- شريط البحث -->
     <div class="search-container">
         <div class="search-wrapper">
             <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن أدوات مطبخ، ديكور، مستلزمات..." oninput="applyFilters()">
@@ -222,26 +224,22 @@
         </div>
     </div>
 
-    <!-- بوكس الخصومات الخاص (يمين ويسار) -->
     <div class="discounts-section" id="discountsWrapper" style="display: none;">
         <div class="section-title">🔥 عروض الخصومات المميزة</div>
         <div class="discounts-scroll" id="discountsGrid"></div>
     </div>
 
-    <!-- المنتجات العادية (فوق وتحت) -->
     <div class="section-title">🛒 كافة المنتجات</div>
     <div class="products-grid" id="productsGrid">
         <p style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">جاري تحميل المنتجات المنزلية...</p>
     </div>
 </div>
 
-<!-- نافذة تكبير الصورة -->
 <div class="image-modal" id="imageModal" onclick="closeImageModal()">
     <span class="close-image-btn">&times;</span>
     <img class="image-modal-content" id="fullImage" src="" alt="صورة مكبرة">
 </div>
 
-<!-- نافذة السلة -->
 <div class="cart-modal" id="cartModal">
     <div class="cart-content">
         <div class="cart-header">
