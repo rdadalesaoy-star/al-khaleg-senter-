@@ -58,6 +58,7 @@
             <input type="number" id="old_price" placeholder="السعر قبل الخصم (اختياري)">
             
             <select id="category">
+                <option value="حاجة بألف">🏷️ حاجة بألف</option>
                 <option value="كهربائيات">⚡ كهربائيات</option>
                 <option value="أدوات مطبخ">🍳 أدوات مطبخ</option>
                 <option value="عناية شخصية">🧴 عناية شخصية</option>
@@ -203,7 +204,7 @@
         document.getElementById('title').value = product.title;
         document.getElementById('price').value = product.price;
         document.getElementById('old_price').value = product.old_price || '';
-        document.getElementById('category').value = product.category || 'كهربائيات';
+        document.getElementById('category').value = product.category || 'حاجة بألف';
         document.getElementById('imageUrl').value = product.image_url || '';
 
         document.getElementById('panelTitle').innerText = 'تعديل المنتج';
